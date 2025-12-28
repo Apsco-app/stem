@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Layout } from "@/components/layout/Layout";
 import { GlassCard } from "@/components/ui/GlassCard";
@@ -9,14 +9,21 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Rocket, CheckCircle, Sparkles, Users, Trophy, Globe } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { z } from "zod";
 
-const sectors = [
-  { value: "sustainability", label: "Sustainability Sector" },
-  { value: "technology", label: "Technology Sector" },
-  { value: "bridge-building", label: "Bridge Building Sector" },
-  { value: "aqualibrium", label: "Aqualibrium Sector" },
-  { value: "mathematics", label: "Mathematics Sector" },
-];
+const applicationSchema = z.object({
+  fullName: z.string().trim().min(2, "Name must be at least 2 characters").max(100, "Name must be less than 100 characters"),
+  email: z.string().trim().email("Invalid email address").max(255, "Email must be less than 255 characters"),
+  schoolClass: z.string().trim().min(1, "School ID/Class is required").max(50, "School ID must be less than 50 characters"),
+  sectorId: z.string().uuid("Please select a sector"),
+  motivation: z.string().trim().min(20, "Please write at least 20 characters").max(2000, "Motivation must be less than 2000 characters"),
+});
+
+interface Sector {
+  id: string;
+  name: string;
+}
 
 const benefits = [
   { icon: Users, title: "Join a Community", description: "Connect with like-minded STEM enthusiasts" },
@@ -28,31 +35,100 @@ const JoinUsPage = () => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [sectors, setSectors] = useState<Sector[]>([]);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
-    schoolId: "",
-    sector: "",
+    schoolClass: "",
+    sectorId: "",
     motivation: "",
   });
 
+  useEffect(() => {
+    const fetchSectors = async () => {
+      const { data, error } = await supabase
+        .from("sectors")
+        .select("id, name")
+        .order("display_order");
+      
+      if (error) {
+        console.error("Error fetching sectors:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load sectors. Please refresh the page.",
+          variant: "destructive",
+        });
+      } else {
+        setSectors(data || []);
+      }
+    };
+
+    fetchSectors();
+  }, [toast]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrors({});
+
+    // Validate form data
+    const result = applicationSchema.safeParse(formData);
+    if (!result.success) {
+      const fieldErrors: Record<string, string> = {};
+      result.error.errors.forEach((err) => {
+        if (err.path[0]) {
+          fieldErrors[err.path[0] as string] = err.message;
+        }
+      });
+      setErrors(fieldErrors);
+      return;
+    }
+
     setIsSubmitting(true);
 
-    // Simulate form submission
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    try {
+      const { error } = await supabase.from("members").insert({
+        full_name: formData.fullName.trim(),
+        email: formData.email.trim().toLowerCase(),
+        school_class: formData.schoolClass.trim(),
+        sector_interest: formData.sectorId,
+        motivation: formData.motivation.trim(),
+        status: "pending",
+      });
 
-    setIsSubmitting(false);
-    setIsSubmitted(true);
-    toast({
-      title: "Application Submitted!",
-      description: "We'll review your application and get back to you soon.",
-    });
+      if (error) {
+        console.error("Submission error:", error);
+        toast({
+          title: "Submission Failed",
+          description: "There was an error submitting your application. Please try again.",
+          variant: "destructive",
+        });
+      } else {
+        setIsSubmitted(true);
+        toast({
+          title: "Application Submitted!",
+          description: "We'll review your application and get back to you soon.",
+        });
+      }
+    } catch (error) {
+      console.error("Unexpected error:", error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors({ ...errors, [name]: "" });
+    }
   };
 
   if (isSubmitted) {
@@ -74,7 +150,16 @@ const JoinUsPage = () => {
               Thank you for your interest in joining UMSSN STEM Club. We'll review your application 
               and contact you soon.
             </p>
-            <Button variant="hero" onClick={() => setIsSubmitted(false)}>
+            <Button variant="hero" onClick={() => {
+              setIsSubmitted(false);
+              setFormData({
+                fullName: "",
+                email: "",
+                schoolClass: "",
+                sectorId: "",
+                motivation: "",
+              });
+            }}>
               Submit Another Application
             </Button>
           </motion.div>
@@ -157,9 +242,9 @@ const JoinUsPage = () => {
                     placeholder="Enter your full name"
                     value={formData.fullName}
                     onChange={handleInputChange}
-                    required
-                    className="bg-muted/30 border-border/50 focus:border-primary"
+                    className={`bg-muted/30 border-border/50 focus:border-primary ${errors.fullName ? "border-red-500" : ""}`}
                   />
+                  {errors.fullName && <p className="text-sm text-red-500">{errors.fullName}</p>}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="email">Email Address *</Label>
@@ -170,42 +255,48 @@ const JoinUsPage = () => {
                     placeholder="you@example.com"
                     value={formData.email}
                     onChange={handleInputChange}
-                    required
-                    className="bg-muted/30 border-border/50 focus:border-primary"
+                    className={`bg-muted/30 border-border/50 focus:border-primary ${errors.email ? "border-red-500" : ""}`}
                   />
+                  {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label htmlFor="schoolId">School ID / Class *</Label>
+                  <Label htmlFor="schoolClass">School ID / Class *</Label>
                   <Input
-                    id="schoolId"
-                    name="schoolId"
+                    id="schoolClass"
+                    name="schoolClass"
                     placeholder="e.g., S6A or Student ID"
-                    value={formData.schoolId}
+                    value={formData.schoolClass}
                     onChange={handleInputChange}
-                    required
-                    className="bg-muted/30 border-border/50 focus:border-primary"
+                    className={`bg-muted/30 border-border/50 focus:border-primary ${errors.schoolClass ? "border-red-500" : ""}`}
                   />
+                  {errors.schoolClass && <p className="text-sm text-red-500">{errors.schoolClass}</p>}
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="sector">Sector of Interest *</Label>
+                  <Label htmlFor="sectorId">Sector of Interest *</Label>
                   <Select
-                    value={formData.sector}
-                    onValueChange={(value) => setFormData({ ...formData, sector: value })}
+                    value={formData.sectorId}
+                    onValueChange={(value) => {
+                      setFormData({ ...formData, sectorId: value });
+                      if (errors.sectorId) {
+                        setErrors({ ...errors, sectorId: "" });
+                      }
+                    }}
                   >
-                    <SelectTrigger className="bg-muted/30 border-border/50 focus:border-primary">
+                    <SelectTrigger className={`bg-muted/30 border-border/50 focus:border-primary ${errors.sectorId ? "border-red-500" : ""}`}>
                       <SelectValue placeholder="Select a sector" />
                     </SelectTrigger>
                     <SelectContent>
                       {sectors.map((sector) => (
-                        <SelectItem key={sector.value} value={sector.value}>
-                          {sector.label}
+                        <SelectItem key={sector.id} value={sector.id}>
+                          {sector.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
+                  {errors.sectorId && <p className="text-sm text-red-500">{errors.sectorId}</p>}
                 </div>
               </div>
 
@@ -217,10 +308,10 @@ const JoinUsPage = () => {
                   placeholder="Tell us about your interest in STEM and what you hope to achieve..."
                   value={formData.motivation}
                   onChange={handleInputChange}
-                  required
                   rows={5}
-                  className="bg-muted/30 border-border/50 focus:border-primary resize-none"
+                  className={`bg-muted/30 border-border/50 focus:border-primary resize-none ${errors.motivation ? "border-red-500" : ""}`}
                 />
+                {errors.motivation && <p className="text-sm text-red-500">{errors.motivation}</p>}
               </div>
 
               <Button
