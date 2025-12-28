@@ -221,7 +221,7 @@ const JoinUsPage = () => {
       {/* Registration Form */}
       <section className="section-container">
         <div className="max-w-2xl mx-auto">
-          <GlassCard className="p-8 md:p-10">
+          <GlassCard className="p-8 md:p-10" hover={false}>
             <div className="flex items-center gap-3 mb-8">
               <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
                 <Rocket className="h-6 w-6 text-white" />
