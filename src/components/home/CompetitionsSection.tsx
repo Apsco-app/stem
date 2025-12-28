@@ -18,10 +18,12 @@ const competitions = [
     link: "https://www.siwi.org/prizes/stockholmjuniorwaterprize/",
   },
   {
-    name: "International Math Olympiad",
-    description: "The most prestigious mathematics competition for high school students.",
-    date: "July 2025",
-    link: "https://www.imo-official.org/",
+    name: "Earth Prize",
+    description: "A global eco-innovation award for teenagers whereby they can win up to $50,000 .",
+    date: "Reg: Sep 2025 - Jan 2026",
+    location: "Geneva, Switzerland",
+    link: "https://www.theearthprize.org/",
+    categories: ["All Sciences", "Mathematics", "Technology"],
   },
   {
     name: "Microsoft Imagine Cup",

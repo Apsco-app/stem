@@ -21,13 +21,7 @@ const contactInfo = [
     title: "Location",
     value: "Uganda Martyrs SS Namugongo, Kampala, Uganda",
     link: null,
-  },
-  {
-    icon: Clock,
-    title: "Hours",
-    value: "Mon - Fri: 8:00 AM - 5:00 PM",
-    link: null,
-  },
+  }
 ];
 
 const ContactPage = () => {

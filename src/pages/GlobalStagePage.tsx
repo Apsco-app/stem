@@ -6,20 +6,20 @@ import { Trophy, Globe, Calendar, ExternalLink, MapPin, Award, Users, Star } fro
 
 const majorCompetitions = [
   {
-    name: "Regeneron ISEF",
-    description: "The world's largest international pre-college science competition, bringing together students from 80+ countries.",
-    date: "May 2025",
-    location: "Los Angeles, USA",
-    link: "https://www.societyforscience.org/isef/",
-    categories: ["All Sciences", "Engineering", "Mathematics"],
+    name: "Earth Prize",
+    description: "A global eco-innovation award for teenagers whereby they can win up to $50,000 .",
+    date: "Reg: Sep 2025 - Jan 2026",
+    location: "Geneva, Switzerland",
+    link: "https://www.theearthprize.org/",
+    categories: ["All Sciences", "Mathematics", "Technology"],
   },
   {
-    name: "International Mathematical Olympiad",
-    description: "The most prestigious mathematics competition for high school students worldwide.",
-    date: "July 2025",
-    location: "Australia",
-    link: "https://www.imo-official.org/",
-    categories: ["Mathematics", "Problem Solving"],
+    name: "American Computer Science League",
+    description: "A non-profit organization running international online programming contests for K-12 students",
+    date: "October 2025-MaY 2026",
+    location: "United States",
+    link: "https://www.acsl.org/",
+    categories: ["Mathematics", "Problem Solving","Computer skills"],
   },
   {
     name: "Stockholm Junior Water Prize",
@@ -38,21 +38,21 @@ const majorCompetitions = [
     categories: ["Technology", "AI", "Software"],
   },
   {
-    name: "Google Science Fair",
-    description: "A global online science and engineering competition open to students ages 13-18.",
-    date: "June 2025",
-    location: "Virtual",
-    link: "https://www.googlesciencefair.com/",
+    name: "IBBC (USA)",
+    description: "The world's largest pre-college science competition.",
+    date: "May 2025",
+    location: "Arizona(USA)",
+    link: "https://www.societyforscience.org/isef/",
     categories: ["Science", "Engineering", "Technology"],
   },
   {
-    name: "Science Olympiad",
-    description: "National STEM competitions covering various scientific disciplines and engineering challenges.",
-    date: "April 2025",
-    location: "Various USA Locations",
-    link: "https://www.soinc.org/",
-    categories: ["All Sciences", "Engineering", "Technology"],
-  },
+  name: "Earth Prize",
+    description: "A global eco-innovation award for teenagers whereby they can win up to $50,000 .",
+    date: "Reg: Sep 2025 - Jan 2026",
+    location: "Geneva, Switzerland",
+    link: "https://www.theearthprize.org/",
+    categories: ["All Sciences", "Mathematics", "Technology"],
+  }
 ];
 
 const stats = [

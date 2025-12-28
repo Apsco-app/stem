@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Zap, Mail, MapPin } from "lucide-react";
-import googleIcon from "@/assets/icons/google.png";
+
 import instagramIcon from "@/assets/icons/instagram.png";
 import tiktokIcon from "@/assets/icons/tiktok.png";
 import facebookIcon from "@/assets/icons/facebook.png";
@@ -22,7 +22,7 @@ const socialLinks = [
   { name: "Facebook", icon: facebookIcon, url: "#" },
   { name: "Instagram", icon: instagramIcon, url: "#" },
   { name: "TikTok", icon: tiktokIcon, url: "#" },
-  { name: "Google", icon: googleIcon, url: "#" },
+
 ];
 
 export function Footer() {

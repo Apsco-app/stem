@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { ArrowRight, Leaf, Cpu, Building, Droplets, Calculator } from "lucide-react";
+import { ArrowRight, Leaf, Cpu, Building, Droplets, Calculator, Hammer } from "lucide-react";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Button } from "@/components/ui/button";
 
@@ -25,7 +25,7 @@ const sectors = [
     id: "bridge-building",
     name: "Bridge Building",
     head: "Eng. Wasswa Paul",
-    icon: Building,
+    icon: Hammer,
     color: "from-orange-500 to-amber-600",
     description: "Structural engineering and architectural design challenges.",
   },

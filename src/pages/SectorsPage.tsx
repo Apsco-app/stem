@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { Layout } from "@/components/layout/Layout";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { GlassCard } from "@/components/ui/GlassCard";
-import { Leaf, Cpu, Building, Droplets, Calculator, User, Calendar, FileText } from "lucide-react";
+import { Leaf, Cpu, Building, Droplets, Calculator, User, Calendar, FileText, HammerIcon } from "lucide-react";
 
 const sectors = [
   {
@@ -14,9 +14,10 @@ const sectors = [
     bgColor: "bg-emerald-500/10",
     description: "The Sustainability Sector focuses on eco-friendly innovations and sustainable engineering solutions. We tackle climate change, renewable energy, and environmental conservation through innovative projects.",
     competitions: [
-      { name: "Regeneron ISEF - Environmental Engineering", date: "May 2025" },
-      { name: "Stockholm Junior Water Prize", date: "August 2025" },
-      { name: "National Environmental Science Competition", date: "March 2025" },
+      { name: "Pitch for the Future",date: "May-Oct 2025" },
+      { name: "The Earth Prize",  date: "September 2025-January 2026" },
+      { name: "Oxford SAID Climate Challenge", date: "January 2025-November 2025" },
+      { name: "Xylem & Egis",date: "Apr-Jun 2025" },
     ],
     focus: ["Renewable Energy", "Waste Management", "Conservation", "Green Technology"],
   },
@@ -29,24 +30,23 @@ const sectors = [
     bgColor: "bg-primary/10",
     description: "The Technology Sector explores cutting-edge innovations from artificial intelligence to robotics. We prepare students for the digital future through hands-on projects and competitions.",
     competitions: [
-      { name: "Microsoft Imagine Cup", date: "March 2025" },
-      { name: "Google Science Fair", date: "June 2025" },
-      { name: "National Robotics Championship", date: "April 2025" },
+      { name: "ACSL(American Computer Science League)", date: "October 2025- May 2026" },
+      { name: "ICSC", date: "Qualification:Aug-Sept 2025 and Finals:Nov 2025" },
+      { name: "Langflow AI Hackathon", date: "Aug-Sept 2025" },
     ],
-    focus: ["Artificial Intelligence", "Robotics", "Software Development", "Cybersecurity"],
+    focus: ["Artificial Intelligence", "Robotics", "Software Development"],
   },
   {
     id: "bridge-building",
     name: "Bridge Building Sector",
     head: "Eng. Wasswa Paul",
-    icon: Building,
+    icon: HammerIcon,
     color: "from-orange-500 to-amber-600",
     bgColor: "bg-orange-500/10",
     description: "The Bridge Building Sector focuses on structural engineering and architectural design challenges. Students learn to design, build, and test load-bearing structures.",
     competitions: [
-      { name: "International Bridge Building Competition", date: "February 2025" },
-      { name: "Science Olympiad - Bridges", date: "April 2025" },
-      { name: "STEM USA Bridge Challenge", date: "May 2025" },
+      { name: "SAICE Bridge Building (Johannesbourg)", date: "August 2025" },
+      { name: "IBBC(USA)", date: "March-April 2025" },
     ],
     focus: ["Structural Engineering", "Load Analysis", "Material Science", "CAD Design"],
   },
@@ -59,11 +59,14 @@ const sectors = [
     bgColor: "bg-blue-500/10",
     description: "The Aqualibrium Sector specializes in water conservation and hydraulic engineering projects. We address water scarcity and develop innovative water management solutions.",
     competitions: [
-      { name: "Stockholm Junior Water Prize", date: "August 2025" },
-      { name: "Aqualibrium National Competition", date: "June 2025" },
-      { name: "Water Innovation Challenge", date: "September 2025" },
+      { name: "SAICE Aquilibrium", date: "May 2025" },
+      { name: "Stockholm Junior Water Prize", date: "June-August 2025" },
+      { name: "ISEF", date: "May 2025" },
+      { name: "imagine Cup (Microsoft)",date: "Jan-May 2025" },
+      { name: "iGEM",date: "Oct 2025" },
+      { name: "UNESCO World Water Day Contest & AquaChallenge",date: "March-varying 2025" },
     ],
-    focus: ["Water Conservation", "Hydraulic Systems", "Water Purification", "Sustainable Irrigation"],
+    focus: ["Water Conservation", "Hydraulic Systems",  "Sustainable Irrigation"],
   },
   {
     id: "mathematics",
@@ -74,11 +77,13 @@ const sectors = [
     bgColor: "bg-violet-500/10",
     description: "The Mathematics Sector prepares students for mathematical olympiads and computational challenges. We develop problem-solving skills and mathematical thinking.",
     competitions: [
-      { name: "International Mathematical Olympiad", date: "July 2025" },
-      { name: "African Mathematics Olympiad", date: "April 2025" },
-      { name: "Pan African Mathematics Olympiad", date: "May 2025" },
+      { name: "AMC 8/10/12", date: "AMC8: Jan 2026; AMC10/12: Nov 2025" },
+      { name: "IYMC 2025", date: "Finals:Nov-Dec 2025" },
+      { name: "Math Kangaroo", date: "March 2026" },
+      { name: "SMT(Stanford) & FISO",date: "SMT:Apr 2025; FISO:Dec -March 2026" },
+      { name: "Path to IMO 2026",date: "Nov-Apr 2026; IMO: Jul 2026" },
     ],
-    focus: ["Number Theory", "Geometry", "Algebra", "Combinatorics"],
+    focus: ["Number Theory", "Geometry", "Algebra"],
   },
 ];
 

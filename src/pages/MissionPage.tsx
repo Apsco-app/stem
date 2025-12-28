@@ -27,12 +27,7 @@ const values = [
   },
 ];
 
-const timeline = [
-  { year: "2023", event: "Club Founded", description: "UMSSN STEM Club established" },
-  { year: "2024", event: "STEM USA Partnership", description: "Official partnership with STEM USA" },
-  { year: "2025", event: "First ISEF Team", description: "Students compete at Regeneron ISEF" },
-  { year: "2026", event: "Asia Expansion", description: "Partnerships with India, Japan, Korea" },
-];
+
 
 const MissionPage = () => {
   return (
@@ -116,34 +111,7 @@ const MissionPage = () => {
         </div>
       </section>
 
-      {/* Timeline */}
-      <section className="section-container bg-card/50">
-        <SectionHeading
-          badge="Our Journey"
-          title="Building the Future"
-          subtitle="From a small school club to a globally connected STEM organization."
-        />
-
-        <div className="max-w-3xl mx-auto">
-          {timeline.map((item, index) => (
-            <motion.div
-              key={item.year}
-              initial={{ opacity: 0, x: index % 2 === 0 ? -30 : 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="relative pl-8 pb-8 border-l-2 border-border last:pb-0"
-            >
-              <div className="absolute left-0 top-0 w-4 h-4 -translate-x-[9px] rounded-full bg-primary shadow-[0_0_10px_hsla(207,90%,54%,0.5)]" />
-              <div className="glass-card p-6">
-                <span className="text-primary font-display font-bold text-lg">{item.year}</span>
-                <h3 className="font-display text-xl font-bold text-foreground mt-1">{item.event}</h3>
-                <p className="text-muted-foreground mt-2">{item.description}</p>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </section>
+      
 
       {/* Quote */}
       <section className="section-container">
