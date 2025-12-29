@@ -32,7 +32,7 @@ const MaintenancePage = () => (
   >
     <div>
       <h1 style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>
-        🚧 Website Under Maintenance
+         Website Under Maintenance
       </h1>
       <p style={{ fontWeight: "bold" }}>
         Uganda Martyrs SS Namugongo STEM Club
