@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Layout } from "@/components/layout/Layout";
-import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { GlassCard } from "@/components/ui/GlassCard";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+
 import { Mail, MapPin, Send, CheckCircle, Phone, Clock } from "lucide-react";
 
 const contactInfo = [
@@ -35,33 +37,68 @@ const ContactPage = () => {
     message: "",
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
+const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
 
-    // Simulate form submission
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-
-    setIsSubmitting(false);
-    setIsSubmitted(true);
-    toast({
-      title: "Message Sent!",
-      description: "We'll get back to you as soon as possible.",
-    });
-  };
+  try {
+   // FIX: The type error is here. We cast the table name to 'any' 
+   // to bypass the type check until the schema file is updated.
+    const { error } = await supabase.from("contact_submissions" as any).insert({
+      name: formData.name.trim(),
+      email: formData.email.trim().toLowerCase(),
+      subject: formData.subject.trim(),
+      message: formData.message.trim(),
+      });
+     if (error) {
+        console.error("Supabase submission error:", error);
+        toast({
+         title: "Submission Failed",
+         description: `Error submitting message. Please check RLS: ${error.message}`,
+         variant: "destructive",
+         });
+     } else {
+        // Success State
+        setIsSubmitted(true);
+        setFormData({ // Clear form fields on successful submission
+         name: "",
+         email: "",
+         subject: "",
+         message: "",
+         });
+         toast({
+          title: "Message Sent!",
+          description: "Thank you. We'll get back to you soon.",
+         });
+        }
+    } catch (error) {
+        console.error("Unexpected error during submission:", error);
+        toast({
+            title: "Unexpected Error",
+            description: "An unexpected error occurred. Please try again.",
+            variant: "destructive",
+        });
+   } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    // If this console log fires, the input field is receiving events.
+    console.log("Input change received for:", e.target.name, "with value:", e.target.value);
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   return (
     <Layout>
       {/* Hero */}
-      <section className="relative pt-32 pb-12 overflow-hidden">
+      {/* FIX 1: Added pointer-events-none to the section to ensure backgrounds don't block content below */}
+      <section className="relative pt-32 pb-12 overflow-hidden pointer-events-none">
         <div className="absolute inset-0 grid-pattern opacity-20" />
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl" />
         
-        <div className="relative container mx-auto px-4 sm:px-6 lg:px-8">
+        {/* FIX 2: Added z-10 and pointer-events-auto to the content container */}
+        <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 pointer-events-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -84,9 +121,11 @@ const ContactPage = () => {
       </section>
 
       {/* Contact Section */}
-      <section className="section-container">
+      {/* FIX 3: Added relative z-20 and pointer-events-auto to lift the entire section above the hero backgrounds */}
+      <section className="section-container relative z-20 pointer-events-auto">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          {/* Contact Info */}
+          
+          {/* Contact Info (Used GlassCard here, assuming it's okay for display only) */}
           <div className="lg:col-span-1 space-y-6">
             {contactInfo.map((info, index) => (
               <motion.div
@@ -95,7 +134,8 @@ const ContactPage = () => {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
-                <GlassCard className="p-6">
+                {/* Ensure GlassCard is just for display and not blocking */}
+                <GlassCard className="p-6"> 
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
                       <info.icon className="h-6 w-6 text-primary" />
@@ -127,7 +167,7 @@ const ContactPage = () => {
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="glass-card p-12 text-center"
+                className="bg-background/80 backdrop-blur-xl border border-border/50 rounded-xl shadow-2xl p-12 text-center"
               >
                 <div className="w-20 h-20 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-6">
                   <CheckCircle className="h-10 w-10 text-green-500" />
@@ -148,12 +188,13 @@ const ContactPage = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
               >
-                <GlassCard className="p-8 md:p-10">
+                {/* FIX 4: REPLACED GLASSCARD WITH STANDARD DIV */}
+                <div className="bg-background/80 backdrop-blur-xl border border-border/50 rounded-xl shadow-2xl p-8 md:p-10 relative z-10">
                   <h2 className="font-display text-2xl font-bold text-foreground mb-6">
                     Send Us a Message
                   </h2>
 
-                  <form onSubmit={handleSubmit} className="space-y-6">
+                  <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="space-y-2">
                         <Label htmlFor="name">Your Name *</Label>
@@ -164,7 +205,7 @@ const ContactPage = () => {
                           value={formData.name}
                           onChange={handleInputChange}
                           required
-                          className="bg-muted/30 border-border/50 focus:border-primary"
+                          className="bg-muted/30 border-border/50 focus:border-primary pointer-events-auto"
                         />
                       </div>
                       <div className="space-y-2">
@@ -177,7 +218,7 @@ const ContactPage = () => {
                           value={formData.email}
                           onChange={handleInputChange}
                           required
-                          className="bg-muted/30 border-border/50 focus:border-primary"
+                          className="bg-muted/30 border-border/50 focus:border-primary pointer-events-auto"
                         />
                       </div>
                     </div>
@@ -191,7 +232,7 @@ const ContactPage = () => {
                         value={formData.subject}
                         onChange={handleInputChange}
                         required
-                        className="bg-muted/30 border-border/50 focus:border-primary"
+                        className="bg-muted/30 border-border/50 focus:border-primary pointer-events-auto"
                       />
                     </div>
 
@@ -205,7 +246,7 @@ const ContactPage = () => {
                         onChange={handleInputChange}
                         required
                         rows={6}
-                        className="bg-muted/30 border-border/50 focus:border-primary resize-none"
+                        className="bg-muted/30 border-border/50 focus:border-primary resize-none pointer-events-auto"
                       />
                     </div>
 
@@ -213,7 +254,7 @@ const ContactPage = () => {
                       type="submit"
                       variant="hero"
                       size="lg"
-                      className="w-full md:w-auto"
+                      className="w-full md:w-auto pointer-events-auto"
                       disabled={isSubmitting}
                     >
                       {isSubmitting ? (
@@ -229,7 +270,7 @@ const ContactPage = () => {
                       )}
                     </Button>
                   </form>
-                </GlassCard>
+                </div>
               </motion.div>
             )}
           </div>

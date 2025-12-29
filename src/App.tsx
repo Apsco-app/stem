@@ -15,7 +15,7 @@ import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
 /** 🔧 TOGGLE MAINTENANCE MODE HERE */
-const MAINTENANCE_MODE = true;
+const MAINTENANCE_MODE = false;
 
 const MaintenancePage = () => (
   <div
