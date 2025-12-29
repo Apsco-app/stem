@@ -55,12 +55,7 @@ const majorCompetitions = [
   }
 ];
 
-const stats = [
-  { icon: Globe, value: "80+", label: "Countries Represented" },
-  { icon: Users, value: "1700+", label: "Students at ISEF" },
-  { icon: Trophy, value: "$8M+", label: "Prizes Awarded" },
-  { icon: Star, value: "20+", label: "Nobel Laureates Alumni" },
-];
+
 
 const GlobalStagePage = () => {
   return (
@@ -92,29 +87,7 @@ const GlobalStagePage = () => {
         </div>
       </section>
 
-      {/* Stats */}
-      <section className="section-container bg-card/50">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {stats.map((stat, index) => (
-            <motion.div
-              key={stat.label}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="text-center"
-            >
-              <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                <stat.icon className="h-7 w-7 text-primary" />
-              </div>
-              <div className="font-display text-3xl md:text-4xl font-bold gradient-text">
-                {stat.value}
-              </div>
-              <div className="text-sm text-muted-foreground mt-1">{stat.label}</div>
-            </motion.div>
-          ))}
-        </div>
-      </section>
+     
 
       {/* Competitions */}
       <section className="section-container">
