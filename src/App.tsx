@@ -38,7 +38,7 @@ const MaintenancePage = () => (
         Uganda Martyrs SS Namugongo STEM Club
       </p>
       <p style={{ marginTop: "0.5rem", opacity: 0.8 }}>
-        We’re adding new features. Please check back soon 🚀
+        We’re adding new features. Please check back soon 
       </p>
     </div>
   </div>
