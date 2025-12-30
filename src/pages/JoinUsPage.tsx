@@ -105,8 +105,8 @@ const JoinUsPage = () => {
       if (error) {
         console.error("Submission error:", error);
         toast({
-          title: "Submission Failed",
-          description: "There was an error submitting your application. Please try again.",
+          title: "Submission already exists",
+          description: "You cannot send an application more than once,please contact Jeremie incase you want to send another one",
           variant: "destructive",
         });
       } else {
