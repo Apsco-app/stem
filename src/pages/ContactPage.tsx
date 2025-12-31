@@ -8,8 +8,7 @@ import { GlassCard } from "@/components/ui/GlassCard";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-
-import { Mail, MapPin, Send, CheckCircle, Phone, Clock } from "lucide-react";
+import { Mail, MapPin, Send, CheckCircle } from "lucide-react";
 
 const contactInfo = [
   {
@@ -23,7 +22,7 @@ const contactInfo = [
     title: "Location",
     value: "Uganda Martyrs SS Namugongo, Kampala, Uganda",
     link: null,
-  }
+  },
 ];
 
 const ContactPage = () => {
@@ -37,67 +36,74 @@ const ContactPage = () => {
     message: "",
   });
 
-const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
 
-  try {
-   // FIX: The type error is here. We cast the table name to 'any' 
-   // to bypass the type check until the schema file is updated.
-    const { error } = await supabase.from("contact_submissions" as any).insert({
-      name: formData.name.trim(),
-      email: formData.email.trim().toLowerCase(),
-      subject: formData.subject.trim(),
-      message: formData.message.trim(),
-      });
-     if (error) {
-        console.error("Supabase submission error:", error);
-        toast({
-         title: "Submission Failed",
-         description: `Error submitting message. Please check RLS: ${error.message}`,
-         variant: "destructive",
-         });
-     } else {
-        // Success State
-        setIsSubmitted(true);
-        setFormData({ // Clear form fields on successful submission
-         name: "",
-         email: "",
-         subject: "",
-         message: "",
-         });
-         toast({
-          title: "Message Sent!",
-          description: "Thank you. We'll get back to you soon.",
-         });
-        }
-    } catch (error) {
-        console.error("Unexpected error during submission:", error);
-        toast({
-            title: "Unexpected Error",
-            description: "An unexpected error occurred. Please try again.",
-            variant: "destructive",
-        });
-   } finally {
-      setIsSubmitting(false);
-    }
-  };
+    try {
+      const { error } = await supabase.from("contact_submissions" as any).insert({
+        name: formData.name.trim(),
+        email: formData.email.trim().toLowerCase(),
+        subject: formData.subject.trim(),
+        message: formData.message.trim(),
+      });
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    // If this console log fires, the input field is receiving events.
-    console.log("Input change received for:", e.target.name, "with value:", e.target.value);
+      if (error) {
+        console.error("Supabase submission error:", error);
+        
+        // Check for duplicate or other specific errors
+        if (error.code === "23505") {
+          toast({
+            title: "Duplicate Submission",
+            description: "You've already sent this message. Please wait for our response.",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Submission Failed",
+            description: "Error submitting message. Please try again.",
+            variant: "destructive",
+          });
+        }
+      } else {
+        // Success
+        setIsSubmitted(true);
+        setFormData({
+          name: "",
+          email: "",
+          subject: "",
+          message: "",
+        });
+        toast({
+          title: "Message Sent!",
+          description: "Thank you. We'll get back to you soon.",
+        });
+      }
+    } catch (error) {
+      console.error("Unexpected error during submission:", error);
+      toast({
+        title: "Unexpected Error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   return (
     <Layout>
       {/* Hero */}
-      {/* FIX 1: Added pointer-events-none to the section to ensure backgrounds don't block content below */}
       <section className="relative pt-32 pb-12 overflow-hidden pointer-events-none">
         <div className="absolute inset-0 grid-pattern opacity-20" />
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl" />
-        
-        {/* FIX 2: Added z-10 and pointer-events-auto to the content container */}
+
         <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 pointer-events-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -109,23 +115,20 @@ const handleSubmit = async (e: React.FormEvent) => {
               Get in Touch
             </span>
             <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6">
-              Let's{" "}
-              <span className="gradient-text">Connect</span>
+              Let's <span className="gradient-text">Connect</span>
             </h1>
             <p className="text-xl text-muted-foreground leading-relaxed">
-              Have questions about UMSSN STEM Club? Want to collaborate or sponsor? 
-              We'd love to hear from you.
+              Have questions about UMSSN STEM Club? Want to collaborate or sponsor? We'd love to
+              hear from you.
             </p>
           </motion.div>
         </div>
       </section>
 
       {/* Contact Section */}
-      {/* FIX 3: Added relative z-20 and pointer-events-auto to lift the entire section above the hero backgrounds */}
       <section className="section-container relative z-20 pointer-events-auto">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          
-          {/* Contact Info (Used GlassCard here, assuming it's okay for display only) */}
+          {/* Contact Info */}
           <div className="lg:col-span-1 space-y-6">
             {contactInfo.map((info, index) => (
               <motion.div
@@ -134,8 +137,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
-                {/* Ensure GlassCard is just for display and not blocking */}
-                <GlassCard className="p-6"> 
+                <GlassCard className="p-6">
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
                       <info.icon className="h-6 w-6 text-primary" />
@@ -188,7 +190,6 @@ const handleSubmit = async (e: React.FormEvent) => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
               >
-                {/* FIX 4: REPLACED GLASSCARD WITH STANDARD DIV */}
                 <div className="bg-background/80 backdrop-blur-xl border border-border/50 rounded-xl shadow-2xl p-8 md:p-10 relative z-10">
                   <h2 className="font-display text-2xl font-bold text-foreground mb-6">
                     Send Us a Message
