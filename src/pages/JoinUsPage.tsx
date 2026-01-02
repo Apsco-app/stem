@@ -25,30 +25,11 @@ interface Sector {
 }
 
 const applicationSchema = z.object({
-  fullName: z
-    .string()
-    .trim()
-    .min(2, "Name must be at least 2 characters")
-    .max(100, "Name must be less than 100 characters"),
-  email: z
-    .string()
-    .trim()
-    .email("Invalid email address")
-    .max(255, "Email must be less than 255 characters"),
-  schoolClass: z
-    .string()
-    .trim()
-    .min(1, "School ID/Class is required")
-    .max(50, "School ID must be less than 50 characters"),
-  sectorId: z
-    .string()
-    .uuid("Please select a valid sector")
-    .min(1, "Please select a sector"),
-  reasonToJoin: z
-    .string()
-    .trim()
-    .min(20, "Please write at least 20 characters")
-    .max(2000, "Reason must be less than 2000 characters"),
+  fullName: z.string().trim().min(2).max(100),
+  email: z.string().trim().email().max(255),
+  schoolClass: z.string().trim().min(1).max(50),
+  sectorId: z.string().uuid(),
+  reasonToJoin: z.string().trim().min(20).max(2000),
 });
 
 // ============================================================================
@@ -88,16 +69,15 @@ const initialFormData = {
 const JoinUsPage = () => {
   const { toast } = useToast();
 
-  // State Management
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [sectors, setSectors] = useState<Sector[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [formData, setFormData] = useState(initialFormData);
 
-  // ============================================================================
+  // ========================================================================
   // Effects
-  // ============================================================================
+  // ========================================================================
 
   useEffect(() => {
     const fetchSectors = async () => {
@@ -107,95 +87,86 @@ const JoinUsPage = () => {
         .order("display_order");
 
       if (error) {
-        console.error("Error fetching sectors:", error);
         toast({
           title: "Error",
-          description: "Failed to load sectors. Please refresh the page.",
+          description: "Failed to load sectors.",
           variant: "destructive",
         });
       } else {
-        setSectors(data || []);
+        setSectors(data ?? []);
       }
     };
 
     fetchSectors();
   }, [toast]);
 
-  // ============================================================================
-  // Event Handlers
-  // ============================================================================
+  // ========================================================================
+  // Handlers
+  // ========================================================================
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-    
-    if (errors[name]) {
-      setErrors({ ...errors, [name]: "" });
-    }
+    setFormData((p) => ({ ...p, [name]: value }));
+    if (errors[name]) setErrors((p) => ({ ...p, [name]: "" }));
   };
 
   const handleSectorChange = (value: string[]) => {
-    // MultiSelect returns an array, but we only need the first value
-    setFormData({ ...formData, sectorId: value[0] || "" });
-    
-    if (errors.sectorId) {
-      setErrors({ ...errors, sectorId: "" });
-    }
+    setFormData((p) => ({ ...p, sectorId: value[0] || "" }));
+    if (errors.sectorId) setErrors((p) => ({ ...p, sectorId: "" }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
 
-    // Validate form data
-    const result = applicationSchema.safeParse(formData);
-    if (!result.success) {
-      const fieldErrors: Record<string, string> = {};
-      result.error.errors.forEach((err) => {
-        if (err.path[0]) {
-          fieldErrors[err.path[0] as string] = err.message;
-        }
+    const parsed = applicationSchema.safeParse(formData);
+    if (!parsed.success) {
+      const map: Record<string, string> = {};
+      parsed.error.errors.forEach((err) => {
+        map[err.path[0] as string] = err.message;
       });
-      setErrors(fieldErrors);
+      setErrors(map);
       return;
     }
 
     setIsSubmitting(true);
 
     try {
+      const payload = {
+        full_name: formData.fullName.trim(),
+        email: formData.email.trim().toLowerCase(),
+        school_class: formData.schoolClass.trim(),
+        sector_id: formData.sectorId, // ✅ Just the UUID string
+        reason_to_join: formData.reasonToJoin.trim(),
+        status: "pending",
+      };
+
       const { error } = await supabase
         .from("members")
-        .insert({
-          full_name: formData.fullName.trim(),
-          email: formData.email.trim().toLowerCase(),
-          school_class: formData.schoolClass.trim(),
-          sector_id: [formData.sectorId],
-          reason_to_join: formData.reasonToJoin.trim(),
-          status: "pending",
-          position: null, // Add position field
-        });
+        .insert([payload]);
 
       if (error) {
-        console.error("Submission error:", error);
+        console.error("Supabase error:", error);
         toast({
-          title: "User already exists",
-          description: "Please try registering with another name.",
+          title: "Submission failed",
+          description: error.message,
           variant: "destructive",
         });
-      } else {
-        setIsSubmitted(true);
-        toast({
-          title: "Application Submitted!",
-          description: "We'll review your application and get back to you soon.",
-        });
+        return;
       }
-    } catch (error) {
-      console.error("Unexpected error:", error);
+
+      setIsSubmitted(true);
       toast({
-        title: "Error",
-        description: "An unexpected error occurred. Please try again.",
+        title: "Application Submitted!",
+        description: "We'll review your application and get back to you soon.",
+      });
+    } catch (err) {
+      console.error("Unexpected error:", err);
+      toast({
+        title: "Unexpected error",
+        description: "Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -208,42 +179,26 @@ const JoinUsPage = () => {
     setFormData(initialFormData);
   };
 
-  // ============================================================================
-  // Conditional Renders
-  // ============================================================================
+  // ========================================================================
+  // Conditional UI
+  // ========================================================================
 
   if (isSubmitted) {
     return (
       <Layout>
         <section className="min-h-screen flex items-center justify-center pt-20">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="text-center max-w-md mx-auto px-4"
-          >
-            <div className="w-20 h-20 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-6">
-              <CheckCircle className="h-10 w-10 text-green-500" />
-            </div>
-            <h1 className="font-display text-3xl font-bold text-foreground mb-4">
-              Application Submitted!
-            </h1>
-            <p className="text-muted-foreground mb-8">
-              Thank you for your interest in joining UMSSN STEM Club. We'll review your
-              application and contact you soon.
-            </p>
-            <Button variant="hero" onClick={resetForm}>
-              Submit Another Application
-            </Button>
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+            <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-4" />
+            <Button onClick={resetForm}>Submit Another</Button>
           </motion.div>
         </section>
       </Layout>
     );
   }
 
-  // ============================================================================
-  // Main Render
-  // ============================================================================
-
+  // ========================================================================
+  // Render
+  // ========================================================================
   return (
     <Layout>
       {/* Hero Section */}
