@@ -58,7 +58,7 @@ const initialFormData = {
   fullName: "",
   email: "",
   schoolClass: "",
-  sectorId: "",
+  sectorIds: [] as string[],
   reasonToJoin: "",
 };
 
@@ -113,8 +113,8 @@ const JoinUsPage = () => {
   };
 
   const handleSectorChange = (value: string[]) => {
-    setFormData((p) => ({ ...p, sectorId: value[0] || "" }));
-    if (errors.sectorId) setErrors((p) => ({ ...p, sectorId: "" }));
+    setFormData((p) => ({ ...p, sectorIds: value }));
+    if (errors.sectorIds) setErrors((p) => ({ ...p, sectorIds: "" }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -138,7 +138,7 @@ const JoinUsPage = () => {
         full_name: formData.fullName.trim(),
         email: formData.email.trim().toLowerCase(),
         school_class: formData.schoolClass.trim(),
-        sector_id: formData.sectorId, // ✅ Just the UUID string
+        sector_id: formData.sectorIds, // ✅ Now an array of UUIDs
         reason_to_join: formData.reasonToJoin.trim(),
         status: "pending",
       };
@@ -330,19 +330,20 @@ const JoinUsPage = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="sectorId">Sector of Interest *</Label>
+                  <Label htmlFor="sectorId">Sectors of Interest (Choose 1-2) *</Label>
                   <MultiSelect
                     options={sectors.map((sector) => ({
                       label: sector.name,
                       value: sector.id,
                     }))}
                     onValueChange={handleSectorChange}
-                    defaultValue={formData.sectorId ? [formData.sectorId] : []}
-                    placeholder="Select a sector"
-                    maxCount={1}
-                    className={errors.sectorId ? "border-red-500" : ""}
+                    defaultValue={formData.sectorIds}
+                    value={formData.sectorIds}
+                    placeholder="Select 1-2 sectors"
+                    maxCount={2}
+                    className={errors.sectorIds ? "border-red-500" : ""}
                   />
-                  {errors.sectorId && <p className="text-sm text-red-500">{errors.sectorId}</p>}
+                  {errors.sectorIds && <p className="text-sm text-red-500">{errors.sectorIds}</p>}
                 </div>
               </div>
 
