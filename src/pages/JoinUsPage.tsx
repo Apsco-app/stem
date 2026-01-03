@@ -28,7 +28,7 @@ const applicationSchema = z.object({
   fullName: z.string().trim().min(2).max(100),
   email: z.string().trim().email().max(255),
   schoolClass: z.string().trim().min(1).max(50),
-  sectorId: z.string().uuid(),
+  sectorIds: z.array(z.string().uuid()).min(1, "Select at least 1 sector").max(2, "Select maximum 2 sectors"),
   reasonToJoin: z.string().trim().min(20).max(2000),
 });
 
